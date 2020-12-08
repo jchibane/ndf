@@ -7,7 +7,6 @@ build/
 /experiments/2*
 /experiments/3*
 /experiments/dist*
-/shapenet/*
 *.cpp
 /trash/
 !.gitkeep
