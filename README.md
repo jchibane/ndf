@@ -40,7 +40,7 @@ Please clone the repository and navigate into it in your terminal, its location 
 The repository currenlty holds the data for the experiment on full (not closed) ShapeNet Car class with 10.000 input points. Further experimental setups will soon follow. 
 
 ## Using Pretrained Model
-Please download the needed data from [here](https://nextcloud.mpi-klsb.mpg.de/index.php/s/Nc6qWEfseH7J7Sz), and unzip it into `shapenet\` - unzipped files require 150 GB free space. 
+Please download the needed data from [here](https://nextcloud.mpi-klsb.mpg.de/index.php/s/Nc6qWEfseH7J7Sz), and unzip it into `shapenet\data` - unzipped files require 150 GB free space. 
 
 Next, you can start generation of instances from the test set via
 ```
