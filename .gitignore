@@ -1,0 +1,15 @@
+__pycache__
+*.so
+build/
+*.pyc
+*.c
+/experiments/2*
+/experiments/3*
+/experiments/dist*
+/shapenet/*
+*.cpp
+/trash/
+!.gitkeep
+*.err
+*.out
+start_job*
