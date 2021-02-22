@@ -1,0 +1,5 @@
+split file
+
+check best validation model implementation: timestamps vs epochs vs 'mini batch iterations'
+
+update environment

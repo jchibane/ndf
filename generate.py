@@ -1,42 +1,62 @@
 import models.local_model as model
 import models.data.voxelized_data_shapenet as voxelized_data
-import numpy as np
 from models.generation import Generator
-from generation_iterator import gen_iterator
 import torch
-import argparse
+import configs.config_loader as cfg_loader
+import os
+import trimesh
+import numpy as np
+from tqdm import tqdm
 
+cfg = cfg_loader.get_config()
 
-parser = argparse.ArgumentParser(
-    description='Run Training'
-)
-
-parser.add_argument('-pc_samples' , default=10000, type=int)
-parser.add_argument('-dist','--sample_distribution', default=[0.01, 0.49, 0.5], nargs='+', type=float)
-parser.add_argument('-std_dev','--sample_sigmas',default=[0.08, 0.02, 0.003], nargs='+', type=float)
-parser.add_argument('-res' , default=256, type=int)
-parser.add_argument('-pretrained', dest='pretrained', action='store_true')
-args = parser.parse_args()
-
-
-split_file = 'shapenet/split_cars.npz'
-model_name = 'SVR'
 device = torch.device("cuda")
-net = model.SVR_enc_dec()
+net = model.NDF()
+
+dataset = voxelized_data.VoxelizedDataset('test',
+                                          res=cfg.input_res,
+                                          pointcloud_samples=cfg.num_points,
+                                          data_path=cfg.data_dir,
+                                          split_file=cfg.split_file,
+                                          batch_size=1,
+                                          num_sample_points=cfg.num_sample_points_generation,
+                                          num_workers=30,
+                                          sample_distribution=cfg.sample_ratio,
+                                          sample_sigmas=cfg.sample_std_dev)
+
+gen = Generator(net, cfg.exp_name, device=device)
+
+out_path = 'experiments/{}/evaluation/'.format(cfg.exp_name)
 
 
-dataset = voxelized_data.VoxelizedDataset('test', pointcloud_samples= args.pc_samples, res=args.res, sample_distribution=args.sample_distribution,
-                                          sample_sigmas=args.sample_sigmas ,num_sample_points=50000, batch_size=1, num_workers=30, split_file = split_file)
+def gen_iterator(out_path, dataset, gen_p):
+    global gen
+    gen = gen_p
 
+    if not os.path.exists(out_path):
+        os.makedirs(out_path)
+    print(out_path)
 
-exp_name = '{}dist-{}sigmas-{}res-{}'.format( 'pretrained_' if args.pretrained else '',
-                                        ''.join(str(e)+'_' for e in args.sample_distribution),
-                                       ''.join(str(e) +'_'for e in args.sample_sigmas),
-                                                                args.res)
+    # can be run on multiple machines: dataset is shuffled and already generated objects are skipped.
+    loader = dataset.get_loader(shuffle=True)
 
+    for i, data in tqdm(enumerate(loader)):
 
-gen = Generator(net,exp_name, device = device)
+        path = os.path.normpath(data['path'][0])
+        export_path = out_path + '/generation/{}/{}/'.format(path.split(os.sep)[-2], path.split(os.sep)[-1])
 
-out_path = 'experiments/{}/evaluation/'.format(exp_name)
+        if os.path.exists(export_path):
+            print('Path exists - skip! {}'.format(export_path))
+            continue
+        else:
+            os.makedirs(export_path)
+
+        for num_steps in [7]:
+            point_cloud, duration = gen.generate_point_cloud(data, num_steps)
+            np.savez(export_path + 'dense_point_cloud_{}'.format(num_steps), point_cloud=point_cloud, duration=duration)
+            print('num_steps', num_steps, 'duration', duration)
+            trimesh.Trimesh(vertices=point_cloud, faces=[]).export(
+                export_path + 'dense_point_cloud_{}.off'.format(num_steps))
+
 
 gen_iterator(out_path, dataset, gen)

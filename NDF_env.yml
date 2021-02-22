@@ -21,6 +21,8 @@ dependencies:
   - tensorboard=2.1.1=py_1
   - torchvision=0.4.0=py36_cu100
   - trimesh=3.6.42=pyh9f0ad1d_0
+  - configargparse=1.2.3=py_0
+  - igl=2.2.1=py36he6478a9_1
   - pip:
     - imageio==2.8.0
     - matplotlib==2.2.5

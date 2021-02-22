@@ -13,3 +13,5 @@ build/
 *.err
 *.out
 start_job*
+*.zip
+datasets/shapenet/data/02958343/

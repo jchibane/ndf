@@ -2,8 +2,6 @@ from __future__ import division
 from torch.utils.data import Dataset
 import os
 import numpy as np
-import pickle
-import imp
 import torch
 import traceback
 
@@ -11,8 +9,8 @@ import traceback
 class VoxelizedDataset(Dataset):
 
 
-    def __init__(self, mode, res = 256, pointcloud_samples = 3000, data_path = 'shapenet/data/', split_file = 'shapenet/split.npz',
-                 batch_size = 64, num_sample_points = 1024, num_workers = 12, sample_distribution = [1], sample_sigmas = [0.015]):
+    def __init__(self, mode, res, pointcloud_samples, data_path, split_file ,
+                 batch_size, num_sample_points, num_workers, sample_distribution, sample_sigmas):
 
         self.sample_distribution = np.array(sample_distribution)
         self.sample_sigmas = np.array(sample_sigmas)
@@ -27,7 +25,6 @@ class VoxelizedDataset(Dataset):
         self.mode = mode
         self.data = self.split[mode]
         self.res = res
-
 
         self.num_sample_points = num_sample_points
         self.batch_size = batch_size
@@ -44,7 +41,7 @@ class VoxelizedDataset(Dataset):
     def __getitem__(self, idx):
         try:
 
-            path = self.path + self.data[idx]
+            path = self.data[idx]
             input_path = path
             samples_path = path
 
@@ -53,7 +50,7 @@ class VoxelizedDataset(Dataset):
             input = np.reshape(occupancies, (self.res,)*3)
 
             if self.mode == 'test':
-                return { 'inputs': np.array(input, dtype=np.float32), 'path' : path}
+                return {'inputs': np.array(input, dtype=np.float32), 'path' : path}
 
             points = []
             coords = []

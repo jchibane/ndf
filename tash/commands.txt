@@ -1,0 +1,65 @@
+
+dl data into datasets/shapenet/
+
+unzip:
+
+unzip datasets/shapenet/02958343.zip -d datasets/shapenet/data/
+
+
+
+
+new packages: 
+configargparse
+
+instal igl
+conda install -c conda-forge igl
+
+install configargparse
+conda install -c anaconda configargparse
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+comparison: pymesh vs igl:
+
+
+In [3]: import trimesh
+
+In [4]: mesh = trimesh.load('/BS/chiban2/work/data_shapenet/data/02691156/10155655850468db78d106ce0a280f87/isosurf_scaled.off')                      
+
+In [6]: points = mesh.sample(100000)                                                                                                                 
+                                                                                                                       
+
+
+In [9]: sigma = 0.5
+
+
+In [11]: import numpy as np
+
+In [12]:             boundary_points = points + sigma * np.random.randn(100000, 3)
+
+
+In [14]: import igl
+
+In [15]: df_igl = igl.signed_distance(boundary_points, mesh.vertices, mesh.faces)[0]
+
+In [16]: import pymesh
+
+
+In [18]: py_mesh = pymesh.load_mesh('/BS/chiban2/work/data_shapenet/data/02691156/10155655850468db78d106ce0a280f87/isosurf_scaled.off')
+
+In [19]: df_pym = np.sqrt(pymesh.distance_to_mesh(py_mesh, boundary_points)[0])
+
+

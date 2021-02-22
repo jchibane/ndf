@@ -9,7 +9,6 @@
 [Supplementaty](http://virtualhumans.mpi-inf.mpg.de/papers/chibane2020ndf/chibane2020ndf-supp.pdf) -
 [Project Website](http://virtualhumans.mpi-inf.mpg.de/ndf/) -
 [Arxiv](https://arxiv.org/abs/2010.13938) -
-Video -
 Published in NeurIPS 2020.
 
 
@@ -28,6 +27,8 @@ If you find our project useful, please cite the following.
 
 A linux system with cuda 10 is required for the project.
 
+Please clone the repository and navigate into it in your terminal, its location is assumed for all subsequent commands.
+
 The `NDF_env.yml` file contains all necessary python dependencies for the project.
 To conveniently install them automatically with [anaconda](https://www.anaconda.com/) you can use:
 ```
@@ -35,41 +36,71 @@ conda env create -f NDF_env.yml
 conda activate NDF
 ```
 
-Please clone the repository and navigate into it in your terminal, its location is assumed for all subsequent commands.
 
-The repository currenlty holds the data for the experiment on full (not closed) ShapeNet Car class with 10.000 input points. Further experimental setups will soon follow. 
+To replicate our experiments, please download the corresponding raw [ShapeNet data](https://shapenet.org/) or the
+closed (watertight) data preprocessed by the authors of [DISN](https://github.com/Xharlie/DISN) [Xu et. al. NeurIPS'19] from [here](https://drive.google.com/drive/folders/1QGhDW335L7ra31uw5U-0V7hB-viA0JXr).
+Then use our data preparation code (see below).
 
-## Using Pretrained Model
-Please download the needed data from [here](https://nextcloud.mpi-klsb.mpg.de/index.php/s/Nc6qWEfseH7J7Sz), and unzip it into `shapenet\data` - unzipped files require 150 GB free space. 
+## Quick Start with Pretrained Model
+Alternatively, to quickly start, you can download the readily prepared data for raw, (not closed) ShapeNet cars: 
+10.000 input points are given to the network as input to infer the detailed, continuous surface.
+Please download the needed data from [here](https://nextcloud.mpi-klsb.mpg.de/index.php/s/Nc6qWEfseH7J7Sz),
+and unzip it into `shapenet/data` - unzipped files require 150 GB free space.
+
 
 Next, you can start generation of instances from the test set via
 ```
-python generate.py -pretrained
+python generate.py --config configs/shapenet_cars_pretrained.txt
 ```
 
+## Experiment Preparation
+First, create a configuration file in folder `configs/`, use `configs/shapenet_cars.txt` as reference and see 
+`configs/config_loader.py` for detailed explanation of all configuration options.
+
+Next, prepare the data for NDF using
+
+```
+python dataprocessing/preprocess.py --config configs/shapenet_cars.txt
+```
+
+and generate a random test/training/validation split of the data using
+```
+python dataprocessing/create_split.py --config configs/shapenet_cars.txt
+```
+
+but replacing `configs/shapenet_cars.txt` in the commands with the desired configuration.
+
+> Note: The preprocessing with `dataprocessing/preprocess.py` can be time intensive. In case multiple compute machines are 
+> available, the script can be run in parralell on those machines by splitting the overall files to preprocess into 
+> chuncks. For this, use: \
+> `python dataprocessing/preprocess.py --num_chunks X --current_chunk Y` \
+> where X is the desired number of chunks (e.g. the number of availiable machines) and Y is the chunk to be processed 
+> with execution of this command. Y needs to be an integer between 0 to X-1, including O and X-1. In case you have SLURM
+> available you can use `slurm_scripts/run_preprocessing.sh` 
 
 ## Training and generation
-To train NDF yourself use
+To train NDF use
 ```
-python train.py 
+python train.py --config configs/shapenet_cars.txt
 ```
 
 
 In the `experiments/` folder you can find an experiment folder containing the model checkpoints, the checkpoint of validation minimum, and a folder containing a tensorboard summary, which can be started at with
 ```
-tensorboard --logdir experiments/YOUR_EXPERIMENT/summary/ --host 0.0.0.0
+tensorboard --logdir experiments/EXP_NAME/summary/ --host 0.0.0.0
 ```
 
 To generate results for instances of the test set, please use
 ```
-python generate.py
+python generate.py --config configs/shapenet_cars.txt
 ```
 
+Again, replacing `configs/shapenet_cars.txt` in the above commands with the desired configuration and `EXP_NAME` with
+the experiment name defined in the configuration.
 
 ## Note & Contact
 
-**Further experiments and updates will follow shortly.**
-For questions and comments regarding the code please contact [Julian Chibane](http://virtualhumans.mpi-inf.mpg.de/people/Chibane.html) via mail. (See Paper)
+For questions and comments please contact [Julian Chibane](http://virtualhumans.mpi-inf.mpg.de/people/Chibane.html) via mail.
 
 ## License
 Copyright (c) 2020 Julian Chibane, Max-Planck-Gesellschaft
@@ -85,4 +116,4 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 You understand and agree that the authors are under no obligation to provide either maintenance services, update services, notices of latent defects, or corrections of defects with regard to the Software. The authors nevertheless reserve the right to update, modify, or discontinue the Software at any time.
 
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software. You agree to cite the `Implicit Functions in Feature Space for 3D Shape Reconstruction and Completion` paper in documents and papers that report on research using this Software.
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software. You agree to cite the `Neural Unsigned Distance Fields for Implicit Function Learning` paper in documents and papers that report on research using this Software.
