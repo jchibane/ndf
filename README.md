@@ -98,7 +98,7 @@ python generate.py --config configs/shapenet_cars.txt
 Again, replacing `configs/shapenet_cars.txt` in the above commands with the desired configuration and `EXP_NAME` with
 the experiment name defined in the configuration.
 
-## Note & Contact
+## Contact
 
 For questions and comments please contact [Julian Chibane](http://virtualhumans.mpi-inf.mpg.de/people/Chibane.html) via mail.
 
