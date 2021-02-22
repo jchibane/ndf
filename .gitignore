@@ -8,10 +8,10 @@ build/
 /experiments/3*
 /experiments/dist*
 *.cpp
-/trash/
+/trash
 !.gitkeep
 *.err
 *.out
 start_job*
 *.zip
-datasets/shapenet/data/02958343/
+datasets/shapenet/data/02958343
