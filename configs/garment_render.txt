@@ -1,0 +1,8 @@
+exp_name = garments_pretrained
+data_dir = datasets/garments_data/
+split_file = datasets/split_garments.npz
+sample_std_dev = [0.08, 0.02, 0.01]
+sample_ratio = [0.02, 0.48, 0.50]
+res = 256
+pc_samples = 3000
+index = 1

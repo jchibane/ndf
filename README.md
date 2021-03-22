@@ -78,6 +78,35 @@ but replacing `configs/shapenet_cars.txt` in the commands with the desired confi
 > with execution of this command. Y needs to be an integer between 0 to X-1, including O and X-1. In case you have SLURM
 > available you can use `slurm_scripts/run_preprocessing.sh` 
 
+## Downloading Garments and Scenes
+
+To run the garment processing run
+
+```
+chmod u+x garment_process.sh
+source garment_process.sh
+```
+
+## Scenes
+Download gibson dataset from [here](https://docs.google.com/forms/d/e/1FAIpQLScWlx5Z1DM1M-wTSXaa6zV8lTFkPmTHW1LqMsoCBDWsTDjBkQ/viewform)
+Specifically we used this version:
+All scenes, 572 scenes (108GB): gibson_v2_all.tar.gz
+
+Then run 
+```
+python scene_process.py --input_path <PATH to Gibson> --output_path <Where data is to be stored> --sigmas 0.01 0.04 0.16 --res 256 --density 0.001708246
+
+```
+
+This also creates a split file of scenes to be later used for training. This is stored in ./datasets alongside the garments split file
+
+
+```
+./datasets/split_scenes.npz
+./datasets/split_garments.npz
+```
+
+
 ## Training and generation
 To train NDF use
 ```
@@ -98,9 +127,27 @@ python generate.py --config configs/shapenet_cars.txt
 Again, replacing `configs/shapenet_cars.txt` in the above commands with the desired configuration and `EXP_NAME` with
 the experiment name defined in the configuration.
 
+## Rendering 
+
+To render garments, run
+
+```
+python render.py --config configs/garment_render.txt
+```
+
+To render cars, run 
+
+```
+python render.py --config configs/cars_render.txt
+```
+
+To render from different perspectives, change the `cam_position` and `cam_orientation` arguments in the `config_render_load` file
+
 ## Contact
 
-For questions and comments please contact [Julian Chibane](http://virtualhumans.mpi-inf.mpg.de/people/Chibane.html) via mail.
+For questions and comments about the training and generation, please contact [Julian Chibane](http://virtualhumans.mpi-inf.mpg.de/people/Chibane.html) via mail.
+
+For questions and comments about the rendering code, please contact [Aymen Mir](http://virtualhumans.mpi-inf.mpg.de/people/Mir.html) via mail.
 
 ## License
 Copyright (c) 2020 Julian Chibane, Max-Planck-Gesellschaft
