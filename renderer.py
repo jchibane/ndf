@@ -5,7 +5,7 @@ import trimesh
 import cv2
 import os
 
-import configs.config_render_loader as cfg_loader
+import configs.config_loader as cfg_loader
 
 import NDF_combine as NDF
 
@@ -26,11 +26,13 @@ class Renderer():
         """
         self.args = cfg_loader.get_config()
 
-        print(self.args.cam_position)
-        print(self.args.cam_orientation)
+        # print(self.args.cam_position)
+        # print(self.args.cam_orientation)
+        os.makedirs(self.args.folder, exist_ok=True)
 
     def create_plane_points_from_bounds(self):
         """
+
             Creates a plane of points which acts as the screen for rendering
         """
         # create an xy plane
@@ -159,7 +161,7 @@ class Renderer():
                     pointcloud_samples = self.args.pc_samples,
                     exp_name = self.args.exp_name, data_dir = self.args.data_dir,
                     split_file = self.args.split_file, sample_distribution = self.args.sample_ratio,
-                    sample_sigmas = self.args.sample_std_dev, res = self.args.res
+                    sample_sigmas = self.args.sample_std_dev, res = self.args.input_res
                     )
 
         depth = np.zeros((self.args.size * self.args.size, 1))

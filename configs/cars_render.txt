@@ -1,8 +1,0 @@
-exp_name = shapenet_cars_pretrained
-data_dir = datasets/shapenet/data/02958343/
-split_file = datasets/shapenet/data/split_cars.npz
-sample_std_dev = [0.08, 0.02, 0.01]
-sample_ratio = [0.02, 0.48, 0.50]
-res = 256
-pc_samples = 10000
-index = 1

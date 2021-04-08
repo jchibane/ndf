@@ -83,6 +83,7 @@ but replacing `configs/shapenet_cars.txt` in the commands with the desired confi
 To run the garment processing run
 
 ```
+cd dataprocessing
 chmod u+x garment_process.sh
 source garment_process.sh
 ```
@@ -132,16 +133,16 @@ the experiment name defined in the configuration.
 To render garments, run
 
 ```
-python render.py --config configs/garment_render.txt
+python renderer.py --config configs/garments.txt
 ```
 
 To render cars, run 
 
 ```
-python render.py --config configs/cars_render.txt
+python renderer.py --config configs/shapenet_cars_pretrained.txt
 ```
 
-To render from different perspectives, change the `cam_position` and `cam_orientation` arguments in the `config_render_load` file
+To render from different perspectives, change the `cam_position` and `cam_orientation` variables in the config files
 
 ## Contact
 

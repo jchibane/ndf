@@ -3,6 +3,9 @@ import numpy as np
 import os
 
 
+def str2bool(inp):
+    return inp.lower() in 'true'
+
 def config_parser():
     parser = configargparse.ArgumentParser()
 
@@ -94,6 +97,36 @@ def config_parser():
     parser.add_argument("--optimizer", type=str, default='Adam',
                         help='Optimizer used during training.')
 
+
+
+    ## Rendering arguments
+    parser.add_argument("--pc_samples", type=int, help='input pointcloud size')
+    parser.add_argument("--index", type=int, help='index to be rendered')
+
+    ###
+    parser.add_argument("--size", type=int, help="the size of image", default=512)
+    parser.add_argument("--max_depth", type=float, help="the max depth of projected rays", default=2)
+    parser.add_argument("--alpha", type=float, help="the value by which the stepping distance should be multiplied",
+                        default=0.6)
+    parser.add_argument("--step_back", type=float, default=0.005, help="the value by which we step back after stopping criteria met")
+    parser.add_argument("--epsilon", type=float, default=0.0026, help="epsilon ball - stopping criteria")
+    parser.add_argument("--screen_bound", type=float, default=0.4)
+    parser.add_argument("--screen_depth", type=float, default=-1)
+
+    parser.add_argument('--cam_position', nargs='+', type=float, help='3D position of camera', default=[0, 0, -1])
+    parser.add_argument('--light_position', nargs='+', type=float, help='3D position of light source',
+                        default=[-1, -1, -1])
+    parser.add_argument("--cam_orientation", nargs='+', type=float,
+                        help="Camera Orientation in xyz euler angles (degrees)", default=[180.0, 0.0, -180.0])
+
+    parser.add_argument("--folder", type=str, default='./save',
+                        help="location where images are to be saved")
+    parser.add_argument("--shade", type=str2bool, default=True, help="whether to save shade image")
+    parser.add_argument("--depth", type=str2bool, default=True, help="whether to save depth image")
+    parser.add_argument("--normal", type=str2bool, default=True, help="whether to save normal image")
+
+    parser.add_argument("--debug_mode", type=str2bool, default=True,
+                        help="to visualize everything in debug mode or not")
 
     return parser
 
