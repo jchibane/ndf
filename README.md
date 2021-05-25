@@ -52,7 +52,7 @@ Next, you can start generation of instances from the test set via
 ```
 python generate.py --config configs/shapenet_cars_pretrained.txt
 ```
-
+Note: Results are generated in the coordinate system of pytorch's grid_sample function (also see [here](https://github.com/jchibane/ndf/blob/master/dataprocessing/boundary_sampling.py#L38-L40)).
 ## Experiment Preparation
 First, create a configuration file in folder `configs/`, use `configs/shapenet_cars.txt` as reference and see 
 `configs/config_loader.py` for detailed explanation of all configuration options.
