@@ -76,7 +76,7 @@ but replacing `configs/shapenet_cars.txt` in the commands with the desired confi
 > `python dataprocessing/preprocess.py --num_chunks X --current_chunk Y` \
 > where X is the desired number of chunks (e.g. the number of availiable machines) and Y is the chunk to be processed 
 > with execution of this command. Y needs to be an integer between 0 to X-1, including O and X-1. In case you have SLURM
-> available you can use adapt `slurm_scripts/run_preprocessing.sh` and use it via
+> available you can adapt `slurm_scripts/run_preprocessing.sh` and use it via
 > ```
 > sbatch slurm_scripts/run_preprocessing.sh
 > ```
