@@ -17,6 +17,17 @@ import random
 
 
 def find_verts(verts, minx, maxx, miny, maxy, minz, maxz):
+    """
+    Finds the vertex indices between the specified points of a cuboid
+    :param verts:
+    :param minx:
+    :param maxx:
+    :param miny:
+    :param maxy:
+    :param minz:
+    :param maxz:
+    :return:
+    """
     verts_locs = np.where(verts[:, 0] <= maxx)
     verts_loc2 = np.where(verts[:, 0] >= minx)
 
@@ -26,11 +37,21 @@ def find_verts(verts, minx, maxx, miny, maxy, minz, maxz):
     verts_locs5 = np.where(verts[:,2] <= maxz)
     verts_locs6 = np.where(verts[:,2] >= minz)
 
-    ret_verts = list(set(verts_locs[0].tolist()) & (set(verts_loc2[0].tolist())) & (set(verts_locs3[0].tolist())) & set(verts_locs4[0].tolist()) & set(verts_locs5[0].tolist()) & (set(verts_locs6[0].tolist())))
+    ret_verts = list(set(verts_locs[0].tolist()) & (set(verts_loc2[0].tolist())) &
+                     (set(verts_locs3[0].tolist())) & set(verts_locs4[0].tolist()) &
+                     set(verts_locs5[0].tolist()) & (set(verts_locs6[0].tolist())))
 
     return ret_verts
 
 def get_boxes(points, low, high):
+    """
+    Splits a set of vertices into cubes
+    :param points: The input set of vertices
+    :param low: The lowest bound of the input mesh
+    :param high: The upper bound of the input mesh
+    :return: A dictionary indexed by the lower left corner of the cuboids
+    Every cube which has atleast one vertex is indexed in the dictionary
+    """
     GRID_sIZE = 2.5
 
     delt = -0.1
@@ -78,7 +99,15 @@ def create_grid_points_from_bounds(min_x, max_x, min_y, max_y, min_z, max_z, res
     return points_list
 
 def bd_sampl_vx_ptcld(input_path, output_path, sigmas, res, density):
-
+    """
+    Creates a voxelized pointcloud and
+    :param input_path:
+    :param output_path:
+    :param sigmas:
+    :param res:
+    :param density:
+    :return:
+    """
     print('Start with: ', input_path)
     try:
         norm_path = os.path.normpath(input_path)
@@ -86,7 +115,7 @@ def bd_sampl_vx_ptcld(input_path, output_path, sigmas, res, density):
 
         obj_path = input_path + '/{}_mesh_texture.obj'.format(scan_name)
 
-        # Check if some other process already working on this path
+        # Check if some other process already working on this scene
         out_query = output_path + '/{}/*/pymesh_boundary_{}_samples.npz'.format(scan_name, sigmas[0])
         if len(glob(out_query)) > 0:
             print('Exists - skip!')
@@ -118,8 +147,8 @@ def bd_sampl_vx_ptcld(input_path, output_path, sigmas, res, density):
 
         print('Split into chunks: ', input_path)
         split_dict = get_boxes(point_cloud, *mesh.bounds)
-
         for cube_corner in split_dict:
+            # Go over ever occupied scene voxel
             print('Start voxelization: ', input_path)
 
             # ===========================
@@ -129,7 +158,7 @@ def bd_sampl_vx_ptcld(input_path, output_path, sigmas, res, density):
             os.makedirs(out_cube_path, exist_ok=True)
             out_file = out_cube_path + 'voxelized_point_cloud_{}res_{}density.npz'.format(res, density)
 
-            min_x, min_y, min_z  = cube_corner
+            min_x, min_y, min_z = cube_corner
             verts_inds = split_dict[cube_corner]
             voxel_point_cloud = point_cloud[verts_inds]
 
@@ -155,11 +184,14 @@ def bd_sampl_vx_ptcld(input_path, output_path, sigmas, res, density):
 
                 verts_inds = find_verts(boundary_points, min_x, min_x + 2.5, min_y, min_y + 2.5, min_z, min_z + 2.5)
 
+                if len(verts_inds) == 0:
+                    continue
+
                 cube_df = df[verts_inds]
                 cube_points = boundary_points[verts_inds]
 
                 cube_points2 = cube_points[:] - cube_corner
-                grid_cube_points =cube_points2.copy()
+                grid_cube_points = cube_points2.copy()
                 grid_cube_points[:, 0], grid_cube_points[:, 2] = cube_points2[:, 2], cube_points2[:, 0]
                 grid_cube_points = grid_cube_points / 2.5
                 grid_cube_points = 2 * grid_cube_points - 1
@@ -173,14 +205,26 @@ def bd_sampl_vx_ptcld(input_path, output_path, sigmas, res, density):
     except:
         print('Error with {}: {}'.format(input_path, traceback.format_exc()))
 
-def normalize_paths(base_path, paths):
-
+def normalize_paths(base_path, paths, res, density, sigmas):
+    """
+    Creates the final split file used for training
+    :param base_path: The location of the output files
+    :param paths: The names of all the scans
+    :return:
+    """
     new_paths = []
     for name in paths:
-        path = base_path + name
+        path = base_path + '/' + name
         cubes_paths = glob(path + '/*/')
-        cubes_paths_normalized = ['/' + name + '/' + os.path.normpath(path_iter).split(os.sep)[-1] for path_iter in
-                                  cubes_paths]
+        cubes_paths_normalized = []
+        for path_iter in cubes_paths:
+            name_cube = base_path + '/' + name + '/' + os.path.normpath(path_iter).split(os.sep)[-1]
+            condition_inc = os.path.exists(os.path.join(name_cube, 'voxelized_point_cloud_{}res_{}density.npz'.format(res, density)))
+
+            for sigma in sigmas:
+                condition_inc = condition_inc and os.path.exists(os.path.join(name_cube, 'pymesh_boundary_{}_samples.npz'.format(sigma)))
+            if condition_inc:
+                cubes_paths_normalized.append('/' + name + '/' + os.path.normpath(path_iter).split(os.sep)[-1])
 
         new_paths = new_paths + cubes_paths_normalized
 
@@ -197,7 +241,8 @@ if __name__ == '__main__':
 
     paths = glob(args.input_path + '/*/')
     paths.sort()
-    paths = paths[:100]
+    paths = paths[:1]
+    print(paths)
     random.shuffle(paths)
 
     p = Pool(mp.cpu_count())
