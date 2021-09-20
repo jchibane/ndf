@@ -13,12 +13,9 @@ def voxelized_pointcloud_sampling(path):
         input_file = os.path.join(out_path,file_name + '_scaled.off')
         out_file = out_path + '/voxelized_point_cloud_{}res_{}points.npz'.format(cfg.input_res, cfg.num_points)
 
-
         if os.path.exists(out_file):
             print(f'Exists: {out_file}')
             return
-
-
 
         mesh = trimesh.load(input_file)
         point_cloud = mesh.sample(cfg.num_points)

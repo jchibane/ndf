@@ -1,0 +1,12 @@
+exp_name = garments_pretrained
+data_dir = datasets/garments_data/
+split_file = datasets/split_garments.npz
+sample_std_dev = [0.08, 0.02, 0.01]
+sample_ratio = [0.02, 0.48, 0.50]
+
+input_res = 256
+pc_samples = 3000
+index = 10
+num_points=1000
+cam_position=[0, 1, 0]
+cam_orientation=[90.0, 0.0, 180.0]
