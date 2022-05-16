@@ -35,6 +35,9 @@ def boundary_sampling(path, sigma):
             boundary_points = points + sigma * np.random.randn(sample_num, 3)
 
         grid_coords = boundary_points.copy()
+        # we need to swap X and Z
+        # its because of this: https://pytorch.org/docs/stable/generated/torch.nn.functional.grid_sample.html
+        # In the case of 5D inputs, grid[n, d, h, w] specifies the x, y, z pixel locations for interpolating output[n, :, d, h, w].
         grid_coords[:, 0], grid_coords[:, 2] = boundary_points[:, 2], boundary_points[:, 0]
 
         grid_coords = 2 * grid_coords
